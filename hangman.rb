@@ -14,11 +14,17 @@ class Hangman
     when 0 then [ComputerPlayer.new, ComputerPlayer.new]
 
     when 1 then
-      input = ""
-      until input =~ /[yn]/
+      begin
         puts "Are you the guesser? (Y/n)"
         input = gets.chomp.downcase
+        unless %w(n y).include?(input)
+          raise StandardError.new "Please enter 'y' or 'n' and suck less."
+        end
+      rescue StandardError => e
+        puts e.message
+        retry
       end
+
       if input == 'y'
         [ComputerPlayer.new, HumanPlayer.new]
       else
@@ -78,23 +84,31 @@ class HumanPlayer < Player
   def choose_word
     puts "Choose wisely, your chosen word."
     input = gets.chomp.downcase
-    until DICTIONARY.include?(input)
-      puts "That's not a word! AGAIN!!!"
-      input = gets.chomp.downcase
+
+    unless DICTIONARY.include?(input)
+      raise StandardError.new "That's not a word! AGAIN!!!"
     end
 
     input
+
+  rescue StandardError => e
+    puts e.message
+    retry
   end
 
   def guess(guesses, word)
     puts "Choose a letter - choose wisely."
     input = gets.chomp.downcase
-    until (("a".."z").to_a - guesses).include?(input)
-      puts "That's not a valid letter! AGAIN!!!"
-      input = gets.chomp.downcase
+
+    unless (("a".."z").to_a - guesses).include?(input)
+      raise StandardError.new "That's not a word! AGAIN!!!"
     end
 
     input
+
+  rescue StandardError => e
+    puts e.message
+    retry
   end
 end
 
